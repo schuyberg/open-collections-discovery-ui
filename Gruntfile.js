@@ -24,8 +24,8 @@ module.exports = function (grunt) {
             server : {
                 options : {
                     port : 9000,
-                    base : 'www',
-                    livereload: true
+                    base : 'www'
+                    // livereload: true
                 }
             }
         },
@@ -55,6 +55,12 @@ module.exports = function (grunt) {
             }
         },
         watch       : {
+            livereload : {
+                options : {
+                    livereload : true
+                },
+                files : ['www/stylesheets/scss/**/*.scss', 'www/js/build/**/*.js', 'www/js/build/**/*.html',]
+            },
             scripts: {
                 files: ['www/js/src/**/*.js', 'www/js/src/**/*.html', 'www/viewer/*.js'],
                 tasks: ['requirejs:dev', 'uglify', 'sass'],
@@ -64,10 +70,7 @@ module.exports = function (grunt) {
             },
             scss: {
                 files: [ 'www/stylesheets/scss/**/*.scss' ],
-                tasks: [ 'sass', 'autoprefixer' ]
-            },
-            options: {
-                livereload: true
+                tasks: [ 'sass', 'autoprefixer'],
             }
         },
         requirejs   : {
@@ -168,24 +171,34 @@ module.exports = function (grunt) {
         },
         replace: {
             // set cache_date to cacheDate in index.php
-            prod: {
-                src: ['www/index.php'],
+            // prod: {
+            //     src: ['www/index.php'],
+            //     overwrite: true,
+            //     replacements: [{
+            //         from: /'cache_date',.*(?=\);)/g,
+            //         to: "'cache_date', '" + cacheDate + "'"
+            //     }, {
+            //         from: /'currently_updating',\strue/g,
+            //         to: "'currently_updating', false"
+            //     }]
+            // },
+            // // set cache_date to empty string: no cacheDate prefix on files for dev
+            // dev: {
+            //     src: ['www/index.php'],
+            //     overwrite: true,
+            //     replacements: [{
+            //         from: /'cache_date',.*(?=\);)/g,
+            //         to: "'cache_date', ''"
+            //     }]
+            // }
+
+            // livereload script
+            reload: {
+                src: ['/www/build/**/*.html'],
                 overwrite: true,
                 replacements: [{
-                    from: /'cache_date',.*(?=\);)/g,
-                    to: "'cache_date', '" + cacheDate + "'"
-                }, {
-                    from: /'currently_updating',\strue/g,
-                    to: "'currently_updating', false"
-                }]
-            },
-            // set cache_date to empty string: no cacheDate prefix on files for dev
-            dev: {
-                src: ['www/index.php'],
-                overwrite: true,
-                replacements: [{
-                    from: /'cache_date',.*(?=\);)/g,
-                    to: "'cache_date', ''"
+                    from: '<!--LIVERELOAD_HERE-->',
+                    to: '<script src="//localhost:35729/livereload.js"></script>'
                 }]
             }
         },
@@ -201,6 +214,6 @@ module.exports = function (grunt) {
     grunt.registerTask('dev', [ 'sass', 'autoprefixer', 'annotate', 'requirejs:dev']);
     grunt.registerTask('uat',  ['clean', 'sass', 'autoprefixer', 'requirejs:prod', 'uglify']);
     grunt.registerTask('prod', ['clean', 'sass', 'autoprefixer', 'requirejs:prod', 'uglify']);
-    grunt.registerTask('serve', ['connect', 'watch']);
+    grunt.registerTask('serve', ['replace:reload', 'connect', 'watch']);
 
 };

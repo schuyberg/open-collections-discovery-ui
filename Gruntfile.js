@@ -17,8 +17,18 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-cache-bust');
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-sass');
+    grunt.loadNpmTasks('grunt-contrib-connect');
 
     grunt.initConfig({
+        connect : {
+            server : {
+                options : {
+                    port : 9000,
+                    base : 'www',
+                    livereload: true
+                }
+            }
+        },
         sass : {
             options: {
                 sourceMap: true,
@@ -49,12 +59,15 @@ module.exports = function (grunt) {
                 files: ['www/js/src/**/*.js', 'www/js/src/**/*.html', 'www/viewer/*.js'],
                 tasks: ['requirejs:dev', 'uglify', 'sass'],
                 options: {
-                    spawn: false
+                    spawn: false,
                 }
             },
             scss: {
                 files: [ 'www/stylesheets/scss/**/*.scss' ],
                 tasks: [ 'sass', 'autoprefixer' ]
+            },
+            options: {
+                livereload: true
             }
         },
         requirejs   : {
@@ -108,7 +121,6 @@ module.exports = function (grunt) {
                 mangle         : true,
                 expand         : true,
             },
-            
             embed: {
                 files: {
                     'www/js/build/embed/search.js': ['www/js/build/embed/search.js']
@@ -189,5 +201,6 @@ module.exports = function (grunt) {
     grunt.registerTask('dev', [ 'sass', 'autoprefixer', 'annotate', 'requirejs:dev']);
     grunt.registerTask('uat',  ['clean', 'sass', 'autoprefixer', 'requirejs:prod', 'uglify']);
     grunt.registerTask('prod', ['clean', 'sass', 'autoprefixer', 'requirejs:prod', 'uglify']);
+    grunt.registerTask('serve', ['connect', 'watch']);
 
 };
